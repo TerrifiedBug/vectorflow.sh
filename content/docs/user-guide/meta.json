@@ -1,0 +1,19 @@
+{
+  "title": "User Guide",
+  "pages": [
+    "dashboard",
+    "pipelines",
+    "pipeline-editor",
+    "vrl-snippets",
+    "environments",
+    "fleet",
+    "alerts",
+    "templates",
+    "shared-components",
+    "ai-suggestions",
+    "cost-optimization",
+    "anomaly-detection",
+    "pipeline-dependencies",
+    "migration-toolkit"
+  ]
+}

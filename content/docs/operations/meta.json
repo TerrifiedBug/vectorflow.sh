@@ -1,0 +1,16 @@
+{
+  "title": "Operations",
+  "pages": [
+    "architecture",
+    "configuration",
+    "authentication",
+    "scim",
+    "service-accounts",
+    "backup-restore",
+    "gitops",
+    "outbound-webhooks",
+    "security",
+    "telemetry",
+    "upgrading"
+  ]
+}

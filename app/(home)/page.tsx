@@ -1,19 +1,21 @@
+import { Hero } from '@/components/landing/Hero';
+import { Pitch } from '@/components/landing/Pitch';
+import { FeatureGrid } from '@/components/landing/FeatureGrid';
+import { Screenshot } from '@/components/landing/Screenshot';
+import { Install } from '@/components/landing/Install';
+import { Footer } from '@/components/landing/Footer';
+
 export default function HomePage() {
   return (
-    <main className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
-      <h1 className="text-4xl font-semibold tracking-tight">VectorFlow</h1>
-      <p className="text-fd-muted-foreground">
-        Visual control plane for Vector data pipelines.
-      </p>
-      <p className="text-sm text-fd-muted-foreground">
-        Site under construction.{' '}
-        <a
-          className="underline"
-          href="https://github.com/TerrifiedBug/vectorflow"
-        >
-          View on GitHub →
-        </a>
-      </p>
-    </main>
+    <>
+      <main>
+        <Hero />
+        <Pitch />
+        <FeatureGrid />
+        <Screenshot />
+        <Install />
+      </main>
+      <Footer />
+    </>
   );
 }
