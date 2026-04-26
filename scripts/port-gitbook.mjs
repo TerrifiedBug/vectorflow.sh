@@ -41,6 +41,14 @@ function transformTabs(source) {
   );
 }
 
+function transformStepper(source) {
+  return source
+    .replace(/\{% stepper %\}/g, '<Steps>')
+    .replace(/\{% endstepper %\}/g, '</Steps>')
+    .replace(/\{% step %\}/g, '<Step>')
+    .replace(/\{% endstep %\}/g, '</Step>');
+}
+
 function transformFigures(source) {
   return source.replace(
     /<figure>\s*<img\s+([^>]*?)\/?>(?:\s*<figcaption>[\s\S]*?<\/figcaption>)?\s*<\/figure>/g,
@@ -61,6 +69,40 @@ function transformFileEmbeds(source) {
   );
 }
 
+// Remap fenced-code language tags that Shiki doesn't ship with. Add entries
+// here when a build error like "Language `X` not found" shows up. Picking a
+// reasonable substitute (or `text` for "no highlighting") avoids a manual
+// edit to the ported file that would regress on the next port run.
+const SHIKI_LANG_REMAP = {
+  caddy: 'text',
+};
+
+function transformFenceLanguages(source) {
+  return source.replace(/```([a-zA-Z0-9_-]+)/g, (match, lang) => {
+    return SHIKI_LANG_REMAP[lang] ? '```' + SHIKI_LANG_REMAP[lang] : match;
+  });
+}
+
+// MDX treats `<` as the start of a JSX tag. In plain prose markdown, you can
+// have `<-> Git` or `**<** (less than)` and the parser will choke. Escape any
+// `<` that is NOT followed by a letter, `/`, or `!` (which start a real tag,
+// closing tag, or HTML comment respectively).
+function escapeOrphanAngleBrackets(source) {
+  return source.replace(/<(?![a-zA-Z/!])/g, '\\<');
+}
+
+// Rewrite relative screenshot paths to absolute /screenshots/ — matches the
+// destination layout where images move from docs-tree to /public/screenshots/.
+function transformScreenshotPaths(source) {
+  return source.replace(
+    /\(((?:\.\.\/)*screenshots\/[^)]+)\)/g,
+    (_match, path) => {
+      const file = path.replace(/^(\.\.\/)+/, '');
+      return `(/${file})`;
+    },
+  );
+}
+
 function transformInternalMdLinks(source) {
   return source.replace(
     /\]\(([^)]+?)\.md(#[^)]*)?\)/g,
@@ -71,13 +113,32 @@ function transformInternalMdLinks(source) {
   );
 }
 
+// If the file has no frontmatter, lift the leading `# Title` line into a YAML
+// frontmatter block (Fumadocs requires `title:`). Strip the H1 from the body —
+// Fumadocs renders the title separately above page content.
+function ensureFrontmatter(source) {
+  if (source.startsWith('---\n')) return source;
+  const match = source.match(/^#\s+(.+?)\s*\n+/);
+  if (!match) return source;
+  const title = match[1].trim();
+  const body = source.slice(match[0].length);
+  return `---\ntitle: ${JSON.stringify(title)}\n---\n\n${body}`;
+}
+
 export function transform(source) {
-  return withProtectedFences(source, (s) => {
+  // Fence language remap MUST run before the fence protector — once the
+  // fences are placeholder-substituted, their language tags are out of reach.
+  const withRemappedFences = transformFenceLanguages(source);
+  const withFrontmatter = ensureFrontmatter(withRemappedFences);
+  return withProtectedFences(withFrontmatter, (s) => {
     s = transformHints(s);
     s = transformTabs(s);
+    s = transformStepper(s);
     s = transformFigures(s);
     s = transformFileEmbeds(s);
     s = transformInternalMdLinks(s);
+    s = transformScreenshotPaths(s);
+    s = escapeOrphanAngleBrackets(s);
     return s;
   });
 }

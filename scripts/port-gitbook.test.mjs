@@ -82,3 +82,76 @@ test('frontmatter is preserved untouched', () => {
   const input = `---\ntitle: Foo\ndescription: Bar\n---\n\n# Body`;
   assert.equal(transform(input), input);
 });
+
+test('leading H1 is lifted into frontmatter when none exists', () => {
+  const input = `# Pipelines\n\nIntro paragraph.`;
+  const expected = `---\ntitle: "Pipelines"\n---\n\nIntro paragraph.`;
+  assert.equal(transform(input), expected);
+});
+
+test('H1 with trailing whitespace is trimmed when lifted', () => {
+  const input = `#   Architecture   \n\nBody.`;
+  const expected = `---\ntitle: "Architecture"\n---\n\nBody.`;
+  assert.equal(transform(input), expected);
+});
+
+test('file without leading H1 and no frontmatter is left alone', () => {
+  const input = `Just a paragraph.\n\n## A subhead but no top-level title.`;
+  assert.equal(transform(input), input);
+});
+
+test('relative screenshot path → absolute /screenshots/ path', () => {
+  const input = `![Pipelines](../screenshots/pipelines.png)`;
+  const expected = `![Pipelines](/screenshots/pipelines.png)`;
+  assert.equal(transform(input), expected);
+});
+
+test('deeper relative screenshot path is also normalised', () => {
+  const input = `![X](../../screenshots/x.png)`;
+  const expected = `![X](/screenshots/x.png)`;
+  assert.equal(transform(input), expected);
+});
+
+test('non-screenshot relative path is untouched', () => {
+  const input = `![X](../assets/x.png)`;
+  assert.equal(transform(input), input);
+});
+
+test('stepper / step blocks → Steps / Step JSX', () => {
+  const input = `{% stepper %}\n{% step %}\nbody one\n{% endstep %}\n{% step %}\nbody two\n{% endstep %}\n{% endstepper %}`;
+  const expected = `<Steps>\n<Step>\nbody one\n</Step>\n<Step>\nbody two\n</Step>\n</Steps>`;
+  assert.equal(transform(input), expected);
+});
+
+test('orphan < before space is escaped', () => {
+  const input = `VectorFlow <-> Git`;
+  const expected = `VectorFlow \\<-> Git`;
+  assert.equal(transform(input), expected);
+});
+
+test('orphan < before * is escaped', () => {
+  const input = `Use **<** for less-than`;
+  const expected = `Use **\\<** for less-than`;
+  assert.equal(transform(input), expected);
+});
+
+test('< followed by JSX tag name is left alone', () => {
+  const input = `<Callout type="info">x</Callout>`;
+  assert.equal(transform(input), input);
+});
+
+test('< followed by closing-slash is left alone', () => {
+  const input = `<img src="x"/>`;
+  assert.equal(transform(input), input);
+});
+
+test('caddy code fence is remapped to text', () => {
+  const input = '```caddy\nblah\n```';
+  const expected = '```text\nblah\n```';
+  assert.equal(transform(input), expected);
+});
+
+test('known fence languages are untouched', () => {
+  const input = '```yaml\nfoo: bar\n```';
+  assert.equal(transform(input), input);
+});
