@@ -75,6 +75,7 @@ function transformFileEmbeds(source) {
 // edit to the ported file that would regress on the next port run.
 const SHIKI_LANG_REMAP = {
   caddy: 'text',
+  promql: 'text',
 };
 
 function transformFenceLanguages(source) {

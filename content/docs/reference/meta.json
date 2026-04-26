@@ -6,6 +6,7 @@
     "agent-architecture",
     "agent-troubleshooting",
     "database",
-    "pipeline-yaml"
+    "pipeline-yaml",
+    "metrics"
   ]
 }
