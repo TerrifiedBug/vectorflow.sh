@@ -1,0 +1,176 @@
+---
+title: "Production Hardening"
+---
+
+VectorFlow's Docker Compose and Helm defaults favor quick setup and broad observability coverage. Before using them in production, decide which defaults your deployment actually needs and scope down the rest.
+
+Use this guide when promoting a proof-of-concept deployment to a production network or cluster.
+
+<Callout type="warn">
+Do not expose a new VectorFlow deployment to untrusted networks until you have reviewed server reachability, image pinning, agent host networking, host log access, and Linux capabilities.
+</Callout>
+
+## Baseline decisions
+
+1. Pin every image tag before deployment.
+2. Bind public services only to the interface or ingress path that should receive traffic.
+3. Keep host networking and host file access only for agents that need host-level telemetry.
+4. Treat enrollment tokens and node tokens as credentials.
+5. Record any accepted host access in your deployment runbook so it can be reviewed later.
+
+## Docker Compose server
+
+### Published server port
+
+The Compose server publishes the application as `3000:3000`. This listens on all host interfaces, which is convenient for local setup but can expose the setup wizard or authenticated UI to networks that should not reach the control plane.
+
+For production:
+
+- Put the server behind a TLS-terminating reverse proxy or load balancer.
+- Bind the Compose port to loopback when only a local proxy should reach it.
+- Restrict inbound traffic with host firewall or security group rules.
+- Set the canonical external URL to the HTTPS address users and agents should use.
+
+Example loopback binding:
+
+```yaml
+ports:
+  - "127.0.0.1:3000:3000"
+```
+
+Keep the all-interface binding only when the host firewall or network boundary already limits access to trusted users and agents.
+
+### Default image tags
+
+The Compose files use `latest` when no version override is supplied. This makes evaluation easy but can cause unplanned upgrades after a pull or host rebuild.
+
+For production:
+
+- Set an explicit VectorFlow version for the server and agent.
+- Pin the database image to a reviewed TimescaleDB/PostgreSQL tag instead of a moving tag.
+- Test upgrades in staging before changing production tags.
+- Keep a rollback tag documented for the last known good release.
+
+Example:
+
+```env
+VF_VERSION=v0.3.0
+```
+
+Use `latest` only for disposable development environments.
+
+### Database exposure
+
+The default server Compose stack does not publish PostgreSQL. Keep it that way unless an external backup or administration host needs direct access.
+
+If the database port must be exposed, bind it to loopback or a private interface and require network-level allowlists. Do not expose PostgreSQL directly to the internet.
+
+## Docker Compose agent
+
+### Host network mode
+
+The Docker agent uses host networking so Vector pipelines can bind host-level listeners such as syslog or receive traffic on the node without extra port mapping. This also removes Docker network isolation for the agent container.
+
+For production:
+
+- Keep host networking only on nodes that run pipelines requiring host-level listeners.
+- Prefer explicit port mappings for agents that only need outbound polling and fixed inbound listener ports.
+- Use host firewall rules to limit listener ports created by deployed Vector pipelines.
+- Label agents by environment or role so high-risk pipelines target only intended nodes.
+
+If host networking is not required, remove host networking and publish only the ports your Vector sources need.
+
+### Agent privileges and file access
+
+The Docker agent can be configured to run as a non-root user, but root may be needed when Vector reads protected host logs or binds privileged ports. The default volume mounts persist agent and Vector state; they do not mount host logs in the Compose file.
+
+For production:
+
+- Run the agent as a non-root user when pipelines do not need privileged host access.
+- Grant read access only to the host files that a pipeline actually tails.
+- Keep the agent data directory private because it contains node enrollment state.
+- Rotate enrollment tokens after use and remove them from shell history, CI logs, and screenshots.
+
+## Helm agent chart
+
+The agent chart deploys a DaemonSet because VectorFlow usually manages one agent per node. Several defaults intentionally favor host observability coverage.
+
+### Host networking
+
+`hostNetwork` defaults to enabled. This lets Vector bind node interfaces and receive host-level traffic, but it also shares the node network namespace with the pod.
+
+For production:
+
+- Set `hostNetwork: false` unless deployed pipelines need node-level listeners.
+- When host networking stays enabled, keep `dnsPolicy: ClusterFirstWithHostNet` so service discovery still works.
+- Use Kubernetes NetworkPolicy for non-host-networked agents.
+- Use node firewalling or cloud security groups for host-networked listeners because pod NetworkPolicy may not apply.
+
+### Host log mounts
+
+The chart mounts host logs by default so Vector can tail node logs. Docker container log mounting is disabled by default and should remain disabled unless needed.
+
+For production:
+
+- Set `mountHostLogs: false` if agents only run synthetic, network, or application-specific sources.
+- Keep container log mounts disabled unless a pipeline explicitly needs Docker JSON logs.
+- Mount narrower host paths with custom chart changes or a dedicated deployment when only one log directory is required.
+- Treat logs as sensitive data; avoid collecting secrets, tokens, and customer payloads unless the pipeline has filtering and retention controls.
+
+### HostPath persistence
+
+The chart defaults to hostPath-backed state for the agent and Vector data. This preserves node identity and buffering across pod restarts, but the data remains on the node filesystem and follows node lifecycle risks.
+
+For production:
+
+- Keep persistent agent state so node identity does not churn after restarts.
+- Protect hostPath directories with restrictive host permissions.
+- Use existing PersistentVolumeClaims if your cluster standardizes storage through a CSI driver.
+- Include agent and Vector state paths in node decommissioning procedures.
+
+### Linux capability
+
+The chart adds `DAC_READ_SEARCH` so the agent and Vector can read host log files owned by other users. This is powerful host-level access.
+
+For production:
+
+- Remove `DAC_READ_SEARCH` when host log reading is disabled or unnecessary.
+- Keep `allowPrivilegeEscalation: false`.
+- Keep `NET_RAW` dropped unless a specific pipeline requires raw sockets.
+- Add any extra capability only with a pipeline-specific justification.
+
+Example capability reduction:
+
+```yaml
+securityContext:
+  privileged: false
+  allowPrivilegeEscalation: false
+  capabilities:
+    add: []
+    drop:
+      - NET_RAW
+```
+
+### Scheduling scope
+
+The chart tolerates control-plane nodes by default so observability can cover the whole cluster. In many production clusters, control-plane nodes should not run application telemetry agents.
+
+For production:
+
+- Remove the control-plane toleration unless you intentionally monitor those nodes.
+- Use node selectors, affinity, taints, and tolerations to target only approved node pools.
+- Use node labels that match your environment and data classification boundaries.
+
+## Production checklist
+
+Before production launch:
+
+- [ ] Image tags are pinned for the server, agent, and database.
+- [ ] The server is reachable only through the intended HTTPS endpoint.
+- [ ] Setup and admin access are restricted to trusted networks and users.
+- [ ] Agent host networking is disabled or explicitly accepted.
+- [ ] Host log and container log mounts are disabled or explicitly accepted.
+- [ ] `DAC_READ_SEARCH` is removed or explicitly accepted.
+- [ ] Enrollment tokens are short-lived, stored securely, and removed from deployment logs.
+- [ ] Firewall, security group, or ingress rules match the intended access paths.
+- [ ] Accepted host-level access is documented for the next security review.

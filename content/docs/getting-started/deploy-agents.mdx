@@ -8,6 +8,10 @@ The VectorFlow agent (`vf-agent`) is a lightweight Go binary that runs on each n
 **Pull-based architecture** -- agents poll the server for config updates. No inbound ports are required on your fleet nodes. The agent initiates all connections, making it firewall-friendly and easy to deploy behind NAT.
 </Callout>
 
+<Callout type="warn">
+Before running agents in production, review [Production Hardening](../operations/production-hardening) for host networking, host log mounts, token handling, and Kubernetes capability guidance.
+</Callout>
+
 ## How it works
 
 1. The agent starts and **enrolls** with the VectorFlow server using a one-time enrollment token

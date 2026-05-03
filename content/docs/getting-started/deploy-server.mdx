@@ -4,6 +4,10 @@ title: "Deploy the Server"
 
 The VectorFlow server is a Next.js application backed by PostgreSQL. This page covers deployment options, environment variables, persistent storage, and production hardening.
 
+<Callout type="info">
+Before exposing a Docker Compose deployment to production traffic, review [Production Hardening](../operations/production-hardening) for server port binding, image pinning, and database exposure guidance.
+</Callout>
+
 <Tabs items={["Docker (recommended)","Standalone"]}>
 <Tab value="Docker (recommended)">
 ## Docker Compose
