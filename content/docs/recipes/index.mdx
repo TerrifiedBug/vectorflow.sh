@@ -1,0 +1,24 @@
+---
+title: "Recipes"
+description: "Common VectorFlow pipeline patterns for operators."
+---
+
+Recipes are practical starting points for common operator workflows. They mirror the built-in migration templates used by VectorFlow, so each example maps cleanly to nodes you can build in the pipeline editor or generate from the Migration Toolkit.
+
+Use these recipes when you need a known-good shape before adapting hostnames, ports, buckets, topics, labels, and secrets for your environment.
+
+| Scenario | Use it when |
+|----------|-------------|
+| [File or syslog to S3](file-syslog-s3) | You need durable log archive storage in AWS S3 |
+| [Kubernetes logs to Loki](kubernetes-loki) | You run workloads on Kubernetes and query logs in Grafana |
+| [HTTP intake to Datadog](http-datadog) | Applications or edge services push JSON events over HTTP |
+| [Fan out one stream](fanout) | The same events need multiple destinations, such as search, archive, and debug output |
+| [Route, filter, and redact](routing-redaction) | You need to split noisy streams or mask sensitive fields before delivery |
+
+## Before you deploy
+
+- Replace sample endpoints, bucket names, topics, and labels.
+- Store credentials as VectorFlow secrets and reference them from the editor instead of pasting raw keys.
+- Validate the generated Vector config before deploy. VectorFlow does this automatically when you deploy from the UI.
+- Start with one environment, confirm event shape with live samples, then promote the pipeline.
+

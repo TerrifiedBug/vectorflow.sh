@@ -1,0 +1,45 @@
+---
+title: "HTTP intake to Datadog"
+description: "Receive application events over HTTP and forward them to Datadog Logs."
+---
+
+Use this recipe when applications can push JSON events to a local or centralized HTTP endpoint. It is based on the built-in HTTP to Datadog migration template.
+
+## Pipeline shape
+
+```
+http_server source -> datadog_logs sink
+```
+
+## Example
+
+```yaml
+sources:
+  http_source:
+    type: http_server
+    address: 0.0.0.0:9880
+
+sinks:
+  datadog_sink:
+    type: datadog_logs
+    inputs:
+      - http_source
+    default_api_key: "${DD_API_KEY}"
+    site: datadoghq.com
+```
+
+## Send a test event
+
+```bash
+curl -X POST http://localhost:9880 \
+  -H "Content-Type: application/json" \
+  -d '{"service":"checkout","level":"info","message":"order accepted"}'
+```
+
+## Operator notes
+
+- Store the Datadog API key as a VectorFlow secret and reference it from the sink configuration.
+- Choose the Datadog `site` that matches your account, such as `datadoghq.com` or `datadoghq.eu`.
+- Put authentication or network controls in front of the HTTP listener before exposing it outside a trusted network.
+- Add a remap transform if applications send inconsistent field names for service, host, or severity.
+

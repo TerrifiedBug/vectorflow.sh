@@ -1,0 +1,68 @@
+---
+title: "Fan out one stream"
+description: "Send the same events to multiple destinations."
+---
+
+Use this recipe when one input stream needs several outputs, such as Elasticsearch for search, S3 for backup, Kafka for downstream consumers, and console output during rollout. It is based on the built-in multi-output fan-out and file to Kafka migration templates.
+
+## Pipeline shape
+
+```
+file source -> elasticsearch sink
+            -> aws_s3 sink
+            -> kafka sink
+            -> console sink
+```
+
+In Vector, fan-out is modeled by pointing multiple sinks at the same upstream component.
+
+## Example
+
+```yaml
+sources:
+  app_source:
+    type: file
+    include:
+      - /var/log/app.log
+
+sinks:
+  es_sink:
+    type: elasticsearch
+    inputs:
+      - app_source
+    endpoints:
+      - http://es-host:9200
+
+  s3_backup_sink:
+    type: aws_s3
+    inputs:
+      - app_source
+    bucket: backup-logs
+    region: us-east-1
+    encoding:
+      codec: json
+
+  kafka_sink:
+    type: kafka
+    inputs:
+      - app_source
+    bootstrap_servers: kafka-broker:9092
+    topic: app-logs
+    encoding:
+      codec: json
+
+  debug_console:
+    type: console
+    inputs:
+      - app_source
+    encoding:
+      codec: json
+```
+
+## Operator notes
+
+- Validate each sink independently before deploying the full fan-out. One bad destination can make troubleshooting harder.
+- Add a remap transform before the sinks if all destinations should receive the same normalized event shape.
+- Keep console output temporary in production. It is useful for rollout checks but can become noisy.
+- If each destination needs a different schema, branch through separate remap transforms before each sink.
+
