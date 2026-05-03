@@ -1,0 +1,129 @@
+---
+title: "How VectorFlow compares"
+description: "Where VectorFlow fits relative to Cribl Stream, Datadog Observability Pipelines, Edge Delta, Mezmo, Splunk Edge Processor, Grafana Alloy, and other observability pipeline tools."
+---
+
+VectorFlow is a **self-hosted control plane for [Vector](https://vector.dev) data pipelines**. It is not an observability backend, a SaaS log search product, or a vendor-lock-in alternative — and it does not try to be. This page is here so you can decide quickly whether VectorFlow is the right tool for what you are doing.
+
+## What VectorFlow is
+
+- A web UI to design Vector pipelines visually instead of hand-editing TOML.
+- A fleet manager that pushes pipeline configs to `vf-agent` processes running alongside Vector on your hosts.
+- A monitoring layer for the pipelines themselves: throughput, error rates, host metrics, anomalies, cost.
+- AGPL-3.0 open source, runs on your own infrastructure, your data never leaves your network.
+
+## What VectorFlow is not
+
+- Not a log search / metrics / tracing backend. Vector still ships the data to your existing destinations (Datadog, Splunk, S3, Elasticsearch, Loki, Kafka, ClickHouse, etc.).
+- Not a SaaS. There is no managed VectorFlow cloud; you run the server yourself.
+- Not a Vector replacement. VectorFlow generates Vector configuration; the data plane is still Vector.
+
+## Where VectorFlow fits
+
+| You are... | VectorFlow is... |
+|---|---|
+| Already running Vector and tired of managing TOML across hosts | The natural next step. Visual editor, fleet rollout, version history, rollback. |
+| Evaluating an observability pipeline tool because you want to cut backend costs (filter, sample, route) | A self-hosted option that keeps you on Vector. No per-GB pricing, no proprietary engine. |
+| Looking for a SaaS pipeline product with managed infrastructure and a sales motion | **Not the right tool.** Look at Cribl Cloud, Datadog Observability Pipelines, Edge Delta, or Mezmo. |
+| Looking for a log search / SIEM product | **Not the right tool.** VectorFlow shapes data; it doesn't store or query it. |
+
+## Side-by-side
+
+The table below is intentionally narrow: it covers tools people already evaluate against VectorFlow. It is not exhaustive.
+
+| | **VectorFlow** | **Cribl Stream** | **Datadog Observability Pipelines** | **Edge Delta** | **Splunk Edge Processor** | **Grafana Alloy / Fleet** |
+|---|---|---|---|---|---|---|
+| **Data engine** | Vector (vector.dev) | Cribl LogStream (proprietary) | Worker proxy fronting Datadog Agent | Edge Delta agent (proprietary) | Splunk SPL pipelines (proprietary) | Grafana Alloy (OTel collector fork) |
+| **Self-hosted, no SaaS dependency** | Yes | Yes (Stream) — but commercial license | No (control plane is SaaS) | No (control plane is SaaS) | Tied to Splunk Cloud / Enterprise | Yes |
+| **Open source license** | AGPL-3.0 | Proprietary (free tier ≤1 TB/day) | Proprietary | Proprietary | Proprietary | Apache-2.0 (Alloy) |
+| **Visual pipeline editor** | Yes | Yes | Yes | Yes | Limited | No (config-as-code) |
+| **Vendor lock-in for the data plane** | None — Vector is open source | High — Cribl-only routes/functions | Datadog Agent / Datadog backend | Edge Delta agent | Splunk | None — Alloy is OTel-compatible |
+| **Pricing model** | Free | Per ingested GB/day | Per host + per GB | Per GB | Splunk licensing | Free |
+| **Where data is stored** | You decide (Vector sinks) | You decide (Cribl outputs) | Datadog (default) | Edge Delta or your sinks | Splunk (default) | You decide (Alloy outputs) |
+| **Fleet rollout / version history / rollback** | Yes | Yes | Yes | Yes | Yes | Via Grafana Fleet (paid) |
+| **Anomaly detection on pipelines** | Yes | Yes | Yes | Yes | No | No |
+| **Runs on your laptop / homelab** | Yes (Docker Compose) | Free tier yes | No | No | No | Yes |
+
+Sources: vendor websites and public docs as of 2026. Pricing and tiers change frequently — check the vendor before committing.
+
+## Honest comparison points
+
+### Cribl Stream
+
+Cribl is the closest commercial analog to VectorFlow in shape — visual pipeline editor, fleet, routing, sampling, redaction. Differences:
+
+- Cribl runs on a **proprietary engine**. Your routes and functions only work in Cribl.
+- Cribl has a deeper feature set today: more first-party integrations, more processing functions, more polished enterprise features.
+- Cribl has a free tier (≤1 TB/day) but is a commercial product above that. VectorFlow is AGPL-3.0 with no usage cap.
+- VectorFlow keeps you on **Vector**, which is also used by Datadog (acquired Timber.io), so your pipelines are portable to other Vector deployments.
+
+**Pick Cribl if** you need a turnkey commercial product with vendor support and you're OK with proprietary lock-in. **Pick VectorFlow if** you want a Vector-native control plane and AGPL is fine.
+
+### Datadog Observability Pipelines
+
+Datadog OP is fundamentally a control plane in front of the Datadog Agent / Vector worker. It is positioned as a way to feed Datadog more efficiently, not as a destination-agnostic tool.
+
+- Control plane is **SaaS-only**, hosted by Datadog.
+- Pricing is on top of existing Datadog infrastructure.
+- Best leverage if Datadog is already your observability backend.
+
+**Pick Datadog OP if** you're already on Datadog and want pipeline control plane with the same vendor. **Pick VectorFlow if** you want self-hosted and destination-agnostic.
+
+### Edge Delta
+
+Edge Delta does heavy edge analytics — pre-aggregating, anomaly detection, partial materialization at the agent — to reduce backend cost. It is more than a pipeline; it does some processing that would otherwise happen in your backend.
+
+- SaaS-managed control plane.
+- Proprietary agent.
+- Strong on edge intelligence; less strong as a generic Vector-style router.
+
+**Pick Edge Delta if** edge analytics + per-GB cost reduction matters more than data-plane portability. **Pick VectorFlow if** you want a transparent Vector pipeline you can audit and self-host.
+
+### Mezmo (formerly LogDNA Pipeline)
+
+Mezmo Pipeline is a SaaS pipeline product with a visual editor.
+
+- SaaS only. Your data flows through Mezmo's control plane.
+- Pricing per GB ingested through pipelines.
+
+**Pick Mezmo if** you want a low-effort SaaS pipeline tool. **Pick VectorFlow if** you can't or won't route data through a third-party SaaS.
+
+### Splunk Edge Processor
+
+Edge Processor pre-processes data before it reaches Splunk Cloud. Not really a destination-agnostic pipeline tool.
+
+- Tightly coupled to Splunk Cloud.
+- Limited routing to non-Splunk destinations.
+
+**Pick Edge Processor if** you're a Splunk shop. **Pick VectorFlow if** you have multiple destinations or aren't on Splunk.
+
+### Grafana Alloy / Fleet
+
+Alloy is Grafana's OpenTelemetry-compatible collector (a fork of the OTel Collector / Grafana Agent line). It overlaps with Vector as a data plane, not directly with VectorFlow.
+
+- No native visual pipeline editor — config-as-code (River).
+- Fleet management is via Grafana Fleet (paid Grafana Cloud feature) or roll-your-own (Ansible, Salt, etc.).
+- OTel-native; Vector is broader (logs, metrics, traces with VRL transformation).
+
+**Pick Alloy if** you're committed to OpenTelemetry and prefer config-as-code. **Pick VectorFlow if** you want Vector's flexibility plus a UI and built-in fleet management.
+
+### Calyptia / Chronosphere
+
+Calyptia (acquired by Chronosphere) builds tools around **Fluent Bit** — a different data plane from Vector. Different ecosystem, different operational model.
+
+**Pick Calyptia if** Fluent Bit is your standard. **Pick VectorFlow if** Vector is.
+
+## When VectorFlow is genuinely the wrong choice
+
+We'd rather you pick the right tool than try to use VectorFlow against the grain.
+
+- **You need a fully managed SaaS** with vendor SLAs and 24/7 support. VectorFlow is self-hosted open source. There is no managed offering yet.
+- **You need a search / analysis backend.** VectorFlow shapes and routes data; it doesn't store or query it. Pair it with Loki, Elasticsearch, ClickHouse, Splunk, Datadog, etc.
+- **You're committed to OpenTelemetry as the agent.** Use Alloy or the OTel Collector. Vector supports OTLP receivers/exporters but is not itself an OTel collector.
+- **You have <50 nodes and don't change pipelines often.** Hand-editing Vector TOML and pushing it with Ansible is genuinely fine at small scale.
+
+## Source code and license
+
+VectorFlow is [AGPL-3.0 on GitHub](https://github.com/TerrifiedBug/vectorflow). The AGPL means: if you modify VectorFlow and run the modified version as a service that other parties interact with over a network, you must publish your changes. For internal use within your own organization, AGPL behaves like GPL — modify freely, no obligation to publish.
+
+If you want a different license, [open an issue](https://github.com/TerrifiedBug/vectorflow/issues) — we may consider commercial licensing for specific embedded use cases.
