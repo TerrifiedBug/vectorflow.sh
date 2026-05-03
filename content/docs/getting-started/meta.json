@@ -1,4 +1,4 @@
 {
   "title": "Getting Started",
-  "pages": ["quick-start", "deploy-server", "deploy-agents", "first-pipeline"]
+  "pages": ["quick-start", "opensearch-quickstart", "deploy-server", "deploy-agents", "first-pipeline"]
 }
