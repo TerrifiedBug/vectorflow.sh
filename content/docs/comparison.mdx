@@ -120,7 +120,7 @@ We'd rather you pick the right tool than try to use VectorFlow against the grain
 - **You need a fully managed SaaS** with vendor SLAs and 24/7 support. VectorFlow is self-hosted open source. There is no managed offering yet.
 - **You need a search / analysis backend.** VectorFlow shapes and routes data; it doesn't store or query it. Pair it with Loki, Elasticsearch, ClickHouse, Splunk, Datadog, etc.
 - **You're committed to OpenTelemetry as the agent.** Use Alloy or the OTel Collector. Vector supports OTLP receivers/exporters but is not itself an OTel collector.
-- **You have <50 nodes and don't change pipelines often.** Hand-editing Vector TOML and pushing it with Ansible is genuinely fine at small scale.
+- **You have fewer than 50 nodes and don't change pipelines often.** Hand-editing Vector TOML and pushing it with Ansible is genuinely fine at small scale.
 
 ## Source code and license
 
