@@ -1,0 +1,11 @@
+{
+  "title": "Recipes",
+  "pages": [
+    "index",
+    "file-syslog-s3",
+    "kubernetes-loki",
+    "http-datadog",
+    "fanout",
+    "routing-redaction"
+  ]
+}

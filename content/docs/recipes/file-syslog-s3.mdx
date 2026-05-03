@@ -1,0 +1,57 @@
+---
+title: "File or syslog to S3"
+description: "Archive application or syslog events to Amazon S3."
+---
+
+Use this recipe when logs need low-cost, durable storage for retention, compliance, or downstream batch processing. It is based on the built-in file tail to S3 migration template, with a syslog source variant for network devices and appliances.
+
+## Pipeline shape
+
+```
+file source or syslog source -> optional remap -> aws_s3 sink
+```
+
+## File tail example
+
+```yaml
+sources:
+  app_logs_source:
+    type: file
+    include:
+      - /var/log/app/*.log
+
+sinks:
+  s3_archive_sink:
+    type: aws_s3
+    inputs:
+      - app_logs_source
+    bucket: my-log-archive
+    region: us-west-2
+    key_prefix: logs/%Y/%m/%d/
+    encoding:
+      codec: json
+    batch:
+      timeout_secs: 3600
+```
+
+## Syslog source variant
+
+Use the same S3 sink, but replace the source with a syslog listener:
+
+```yaml
+sources:
+  syslog_source:
+    type: syslog
+    address: 0.0.0.0:5140
+    mode: tcp
+```
+
+Then point the S3 sink input at `syslog_source`.
+
+## Operator notes
+
+- Vector handles file checkpoints automatically, so a separate FluentD-style `pos_file` is not required.
+- Use a date-based `key_prefix` so objects remain partitioned for lifecycle policies and query tools.
+- Prefer VectorFlow secrets for AWS credentials. Do not hard-code access keys in node configuration.
+- If incoming syslog volume is high, deploy the listener on dedicated nodes and verify firewall rules before switching senders.
+

@@ -1,0 +1,79 @@
+---
+title: "Route, filter, and redact"
+description: "Filter noisy events, route by severity, and mask sensitive fields."
+---
+
+Use this recipe when one stream contains mixed severity, health checks, or sensitive fields that should not reach every destination. The routing pattern is based on the built-in grep routing migration template, and the redaction step uses VectorFlow's DLP remap templates.
+
+## Pipeline shape
+
+```
+file source -> filter allowed levels -> filter health checks -> redact -> route -> sinks
+```
+
+## Example
+
+```yaml
+sources:
+  app_source:
+    type: file
+    include:
+      - /var/log/app.log
+
+transforms:
+  grep_filter:
+    type: filter
+    inputs:
+      - app_source
+    condition: .level == "ERROR" || .level == "WARN" || .level == "INFO"
+
+  exclude_healthcheck:
+    type: filter
+    inputs:
+      - grep_filter
+    condition: '!starts_with(to_string(.message) ?? "", "healthcheck")'
+
+  redact_sensitive_fields:
+    type: remap
+    inputs:
+      - exclude_healthcheck
+    source: |
+      if exists(.email) {
+        .email = redact!(to_string!(.email), filters: ["pattern"], patterns: [r'\S+@\S+'])
+      }
+      if exists(.message) {
+        .message = replace(to_string!(.message), r'Bearer\s+[A-Za-z0-9\-._~+/]+=*', "Bearer [REDACTED-KEY]")
+      }
+
+  level_router:
+    type: route
+    inputs:
+      - redact_sensitive_fields
+    route:
+      error: .level == "ERROR"
+      normal: .level == "WARN" || .level == "INFO"
+
+sinks:
+  error_alerts_sink:
+    type: elasticsearch
+    inputs:
+      - level_router.error
+    endpoints:
+      - http://es-alerts:9200
+
+  normal_file_sink:
+    type: file
+    inputs:
+      - level_router.normal
+    path: /var/log/processed/normal/%Y-%m-%d.log
+    encoding:
+      codec: json
+```
+
+## Operator notes
+
+- FluentD `grep` filters map to Vector filter transforms with VRL conditions.
+- FluentD tag rewrites map to Vector route transforms. Route outputs use `route_name.branch_name` as sink inputs.
+- Put redaction before fan-out or routing when every destination should receive masked data.
+- Use VectorFlow DLP templates for common credit card, SSN, email, IP, phone, API key, custom regex, and JSON field removal patterns.
+

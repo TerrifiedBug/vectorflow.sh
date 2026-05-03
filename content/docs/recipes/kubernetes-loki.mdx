@@ -1,0 +1,40 @@
+---
+title: "Kubernetes logs to Loki"
+description: "Collect Kubernetes container logs and send them to Grafana Loki."
+---
+
+Use this recipe when VectorFlow agents run on Kubernetes nodes and your team queries logs in Grafana Loki. It is based on the built-in Kubernetes to Loki migration template.
+
+## Pipeline shape
+
+```
+kubernetes_logs source -> loki sink
+```
+
+## Example
+
+```yaml
+sources:
+  k8s_logs_source:
+    type: kubernetes_logs
+
+sinks:
+  loki_sink:
+    type: loki
+    inputs:
+      - k8s_logs_source
+    endpoint: http://loki:3100
+    labels:
+      app: '{{ kubernetes.pod_labels."app" }}'
+      namespace: "{{ kubernetes.pod_namespace }}"
+    encoding:
+      codec: json
+```
+
+## Operator notes
+
+- The `kubernetes_logs` source replaces file tailing plus the FluentD Kubernetes metadata filter.
+- Keep Loki labels low-cardinality. Namespace, workload, and app labels are usually useful; pod UID and container ID usually are not.
+- Confirm the `app` label exists across workloads. If it is inconsistent, use a remap transform to set a fallback label before the Loki sink.
+- Use the endpoint that is reachable from the agent runtime, not necessarily the endpoint used by Grafana.
+

@@ -1,47 +1,64 @@
-# vectorflow-sh-tmp
+# VectorFlow public docs
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+This repository contains the public documentation and marketing site for VectorFlow at <https://vectorflow.sh>. The docs are built with Next.js, Fumadocs, MDX, and static export.
 
-It is a Next.js app with [Static Export](https://nextjs.org/docs/app/guides/static-exports) configured.
+## Local preview
 
-Run development server:
+Use pnpm so the lockfile stays consistent:
 
 ```bash
-npm run dev
-# or
+pnpm install
 pnpm dev
-# or
-yarn dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open <http://localhost:3000> for the site and <http://localhost:3000/docs> for the documentation.
 
-## Explore
+## Project structure
 
-In the project, you can see:
+| Area | Purpose |
+|------|---------|
+| `content/docs` | MDX documentation pages and section metadata |
+| `content/docs/meta.json` | Top-level docs navigation order |
+| `content/docs/*/meta.json` | Section titles and page order |
+| `app/(home)` | Landing page routes |
+| `app/docs` | Fumadocs documentation routes |
+| `app/api/search/route.ts` | Search index route |
+| `lib/source.ts` | Fumadocs content source adapter |
+| `lib/layout.shared.tsx` | Shared layout and navigation options |
+| `public/screenshots` | Product screenshots used by the site |
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+## Authoring conventions
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+- Put user-facing docs in `content/docs`.
+- Add or update the nearest `meta.json` whenever you create, rename, or reorder pages.
+- Use short frontmatter titles that match the sidebar label.
+- Start with the fastest successful path, then add advanced or troubleshooting detail.
+- Prefer concrete commands, expected outcomes, and operational checks.
+- Keep examples runnable. Do not invent environment variables, API fields, ports, or command output.
+- Use VectorFlow secrets in examples that need credentials. Do not paste real keys or token-shaped values.
+- Link to related docs with relative links when the target is inside the docs site.
+- Keep screenshots in `public/screenshots` and use descriptive alt text.
 
-### Fumadocs MDX
+## Checks
 
-A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
+Run these before opening a PR:
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+```bash
+pnpm types:check
+pnpm build
+```
 
-## Learn More
+`pnpm types:check` regenerates Fumadocs MDX output, runs Next.js type generation, and checks TypeScript. `pnpm build` verifies the static export path used for deployment.
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
+## Link checks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+There is no dedicated link-check script in this repo yet. Before publishing docs changes:
+
+- Click through new sidebar entries in the local preview.
+- Check every new relative link from the rendered page.
+- Verify external docs links still point to the current vendor page.
+- Run `pnpm build`; broken MDX imports and invalid route generation should fail there.
+
+## Pull requests
+
+Keep PRs focused on one reader outcome. For example, a new recipe section should include the pages, navigation metadata, and any cross-links needed to make the section discoverable.
