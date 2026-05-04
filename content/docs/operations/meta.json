@@ -2,6 +2,7 @@
   "title": "Operations",
   "pages": [
     "architecture",
+    "deploy-state-machine",
     "configuration",
     "authentication",
     "scim",
