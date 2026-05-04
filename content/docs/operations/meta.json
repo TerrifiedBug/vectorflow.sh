@@ -10,6 +10,7 @@
     "gitops",
     "outbound-webhooks",
     "security",
+    "production-hardening",
     "telemetry",
     "upgrading"
   ]
