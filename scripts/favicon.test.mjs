@@ -2,15 +2,35 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const upstreamLogoLight = `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="44" viewBox="0 0 280 44">
-  <text x="140" y="35" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="36" letter-spacing="-0.5">
-    <tspan font-weight="700" fill="#0a0a0a">Vector</tspan><tspan font-weight="300" fill="#0a0a0a">Flow</tspan>
-  </text>
+const upstreamAppIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" fill="none">
+  <rect width="28" height="28" rx="6" fill="#0a0b0d"/>
+  <path
+    d="M14 1.5L25.5 8v12L14 26.5 2.5 20V8L14 1.5z"
+    stroke="#e6e8ec"
+    stroke-width="1.5"
+    stroke-linejoin="round"
+    opacity="0.55"
+  />
+  <path
+    d="M8 10l6 4 6-4"
+    stroke="#7dd957"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M8 16l6 4 6-4"
+    stroke="#7dd957"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.5"
+  />
 </svg>
 `;
 
-test('site favicon uses the upstream VectorFlow light logo', async () => {
+test('site favicon uses the upstream VectorFlow app icon', async () => {
   const icon = await readFile(new URL('../app/icon.svg', import.meta.url), 'utf8');
 
-  assert.equal(icon, upstreamLogoLight);
+  assert.equal(icon, upstreamAppIcon);
 });
