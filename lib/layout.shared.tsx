@@ -1,10 +1,11 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { appName, gitConfig } from './shared';
+import { Wordmark } from '@/components/landing/Nav';
+import { gitConfig } from './shared';
 
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: appName,
+      title: <Wordmark label="vectorflow docs" />,
     },
     links: [
       { text: 'Docs', url: '/docs' },
