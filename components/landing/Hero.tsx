@@ -20,7 +20,7 @@ export function Hero() {
           history, rollback — without a deploy script.
         </p>
         <div className="hero-cta">
-          <a href="https://demo.vectorflow.sh" className="btn primary lg">
+          <a href="https://demo.vectorflow.sh/login?prefill=demo" className="btn primary lg">
             Try the live demo <span className="arrow">→</span>
           </a>
           <a href="https://github.com/TerrifiedBug/vectorflow" className="btn lg">
@@ -48,7 +48,7 @@ export function Hero() {
             <div className="k">Status</div>
             <div className="v">
               <span className="dot pulse status-dot" />shipping{' '}
-              <span className="acc-dot">v0.18</span>
+              <span className="acc-dot">v0.2.0</span>
             </div>
           </div>
         </div>

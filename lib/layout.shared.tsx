@@ -9,7 +9,7 @@ export function baseOptions(): BaseLayoutProps {
     },
     links: [
       { text: 'Docs', url: '/docs' },
-      { text: 'Demo', url: 'https://demo.vectorflow.sh', external: true },
+      { text: 'Demo', url: 'https://demo.vectorflow.sh/login?prefill=demo', external: true },
     ],
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };

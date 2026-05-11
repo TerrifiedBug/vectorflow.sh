@@ -25,7 +25,7 @@ export function Nav() {
         <div className="nav-cta">
           <ThemeToggle />
           <Link href="/docs" className="btn ghost">Docs</Link>
-          <a href="https://demo.vectorflow.sh" className="btn primary">
+          <a href="https://demo.vectorflow.sh/login?prefill=demo" className="btn primary">
             Try the demo <span className="arrow">→</span>
           </a>
         </div>
