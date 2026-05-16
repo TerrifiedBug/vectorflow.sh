@@ -15,8 +15,8 @@ export function Footer() {
           </div>
           <div className="col">
             <h6>Product</h6>
-            <a href="#features">Features</a>
-            <a href="#compare">Compare</a>
+            <Link href="/#features">Features</Link>
+            <Link href="/#compare">Compare</Link>
             <a href="https://demo.vectorflow.sh/login?prefill=demo">Live demo</a>
             <Link href="/docs/getting-started/quick-start">Quick start</Link>
           </div>
