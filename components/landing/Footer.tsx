@@ -34,6 +34,13 @@ export function Footer() {
             <a href="https://github.com/TerrifiedBug/vectorflow/blob/main/LICENSE">License (AGPL-3.0)</a>
             <Link href="/docs/operations/telemetry">Telemetry</Link>
           </div>
+          <div className="col">
+            <h6>Trust</h6>
+            <Link href="/trust">Overview</Link>
+            <Link href="/trust/subprocessors">Sub-processors</Link>
+            <Link href="/trust/dpa">DPA</Link>
+            <a href="https://github.com/TerrifiedBug/vectorflow/blob/main/docs/cloud/threat-model.md">Threat model</a>
+          </div>
         </div>
         <div className="foot-bottom">
           <span className="fine">
