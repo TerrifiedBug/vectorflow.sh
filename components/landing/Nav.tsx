@@ -17,9 +17,10 @@ export function Nav() {
       <div className="wrap nav-inner">
         <Wordmark />
         <div className="nav-links">
-          <a href="#features" className="has-chev">Product</a>
-          <a href="#compare" className="has-chev">Compare</a>
+          <Link href="/#features" className="has-chev">Product</Link>
+          <Link href="/#compare" className="has-chev">Compare</Link>
           <Link href="/docs" className="has-chev">Docs</Link>
+          <Link href="/trust" className="has-chev">Trust</Link>
           <a href="https://github.com/TerrifiedBug/vectorflow" className="has-chev">GitHub</a>
         </div>
         <div className="nav-cta">
