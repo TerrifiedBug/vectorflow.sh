@@ -50,13 +50,6 @@ const rows: Row[] = [
     location: 'Global',
     dpa: 'Cloudflare Data Processing Addendum',
   },
-  {
-    processor: 'PostHog (self-hosted on VectorFlow stamps)',
-    purpose:
-      'Product telemetry — opt-in per organization via OrganizationSettings.telemetryEnabled; we host the PostHog instance ourselves so data never leaves the VectorFlow trust boundary',
-    location: 'eu-west-2 (London) by default; tracks the stamp region',
-    dpa: 'N/A (self-hosted; no third-party processor)',
-  },
 ];
 
 export default function SubprocessorsPage() {
