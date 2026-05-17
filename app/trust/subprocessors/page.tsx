@@ -50,6 +50,13 @@ const rows: Row[] = [
     location: 'Global',
     dpa: 'Cloudflare Data Processing Addendum',
   },
+  {
+    processor: 'PostHog (self-hosted on VectorFlow stamps)',
+    purpose:
+      'Product telemetry — opt-in per organization via OrganizationSettings.telemetryEnabled; we host the PostHog instance ourselves so data never leaves the VectorFlow trust boundary',
+    location: 'eu-west-2 (London) by default; tracks the stamp region',
+    dpa: 'N/A (self-hosted; no third-party processor)',
+  },
 ];
 
 export default function SubprocessorsPage() {
@@ -66,7 +73,7 @@ export default function SubprocessorsPage() {
             sub-processor to this list.
           </p>
           <p className="trust-meta">
-            Last updated: 2026-05-16. Subscribe to changes by emailing{' '}
+            Last updated: 2026-05-17. Subscribe to changes by emailing{' '}
             <a href="mailto:trust@vectorflow.sh" className="link">
               trust@vectorflow.sh
             </a>
