@@ -1,0 +1,95 @@
+---
+title: "OpenSearch Compose Quickstart"
+---
+
+This optional Compose profile starts VectorFlow, TimescaleDB/PostgreSQL, OpenSearch, OpenSearch Dashboards, and a small Vector demo pipeline that writes generated log events into OpenSearch.
+
+Use it for local onboarding, homelab testing, or quick sink validation. It is not a production OpenSearch deployment: security is disabled, the cluster is single-node, and heap size is tuned for a small 4 GB RAM machine.
+
+## Start
+
+From the repository root:
+
+```bash
+cd docker/server
+cp .env.example .env
+```
+
+Edit `.env` and set at least:
+
+```env
+POSTGRES_PASSWORD=changeme
+NEXTAUTH_SECRET=generate-a-random-32-char-string-here
+NEXTAUTH_URL=http://localhost:3000
+```
+
+On Linux hosts, increase the OpenSearch kernel map count before starting the profile:
+
+```bash
+sudo sysctl -w vm.max_map_count=262144
+```
+
+To make that persistent across reboots:
+
+```bash
+echo 'vm.max_map_count=262144' | sudo tee /etc/sysctl.d/99-opensearch.conf
+sudo sysctl --system
+```
+
+If you are using Docker Desktop on macOS or Windows, Docker’s Linux VM typically already satisfies this requirement.
+
+Start the stack:
+
+```bash
+docker compose --profile opensearch up -d
+```
+
+The profile adds:
+
+- OpenSearch at `http://localhost:9200`
+- OpenSearch Dashboards at `http://localhost:5601`
+- A demo Vector pipeline from `examples/opensearch-demo/vector-demo-opensearch.yaml`
+
+The default path is unchanged. Running `docker compose up -d` without `--profile opensearch` starts only the standard VectorFlow server stack.
+
+## Verify ingestion
+
+Wait for OpenSearch and Dashboards to finish starting, then check that demo documents are arriving:
+
+```bash
+curl "http://localhost:9200/vectorflow-demo-*/_count?pretty"
+```
+
+Open Dashboards at [http://localhost:5601](http://localhost:5601). Create an index pattern named `vectorflow-demo-*`, choose `ingested_at` as the time field, then open Discover to view generated demo events.
+
+## Resource defaults
+
+The profile keeps defaults small for beginner and homelab machines:
+
+- OpenSearch heap: `512m` minimum and maximum
+- OpenSearch container memory limit: `1g`
+- Dashboards memory limit: `512m`
+- Demo Vector pipeline memory limit: `128m`
+- Security plugins disabled for both OpenSearch and Dashboards
+
+If your machine is under memory pressure, stop other local services before starting this profile.
+
+## Teardown
+
+Stop the optional profile:
+
+```bash
+docker compose --profile opensearch down
+```
+
+Remove OpenSearch data when you no longer need the sample index:
+
+```bash
+docker volume rm vectorflow-opensearch-data
+```
+
+To remove every volume from the server Compose stack, including the VectorFlow database and backups, use:
+
+```bash
+docker compose --profile opensearch down -v
+```
