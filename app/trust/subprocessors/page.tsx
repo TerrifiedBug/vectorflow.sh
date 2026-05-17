@@ -66,7 +66,7 @@ export default function SubprocessorsPage() {
             sub-processor to this list.
           </p>
           <p className="trust-meta">
-            Last updated: 2026-05-17. Subscribe to changes by emailing{' '}
+            Last updated: 2026-05-16. Subscribe to changes by emailing{' '}
             <a href="mailto:trust@vectorflow.sh" className="link">
               trust@vectorflow.sh
             </a>
