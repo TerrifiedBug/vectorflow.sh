@@ -1,4 +1,5 @@
-import Link from 'next/link';
+const CLOUD_SIGNUP_URL =
+  process.env.NEXT_PUBLIC_CLOUD_SIGNUP_URL ?? 'https://cloud.vectorflow.sh/signup';
 
 export function Hero() {
   return (
@@ -20,16 +21,20 @@ export function Hero() {
           history, rollback — without a deploy script.
         </p>
         <div className="hero-cta">
-          <a href="https://demo.vectorflow.sh/login?prefill=demo" className="btn primary lg">
-            Try the live demo <span className="arrow">→</span>
+          <a href={CLOUD_SIGNUP_URL} className="btn primary lg">
+            Start free on Cloud <span className="arrow">→</span>
           </a>
-          <a href="https://github.com/TerrifiedBug/vectorflow" className="btn lg">
-            View on GitHub
+          <a href="https://demo.vectorflow.sh/login?prefill=demo" className="btn lg">
+            Live demo
           </a>
-          <Link href="/docs/getting-started/quick-start" className="btn ghost lg">
-            Quick start ›
-          </Link>
+          <a href="https://github.com/TerrifiedBug/vectorflow" className="btn ghost lg">
+            View on GitHub ›
+          </a>
         </div>
+        <p className="hero-cta-note">
+          Free plan: 3 nodes, 1 GB ingest/mo. Self-host the AGPL build any
+          time from <a href="https://github.com/TerrifiedBug/vectorflow">GitHub</a>.
+        </p>
 
         <div className="hero-meta">
           <div className="item">

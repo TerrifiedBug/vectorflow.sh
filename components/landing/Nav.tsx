@@ -11,6 +11,9 @@ export function Wordmark({ label = 'vectorflow home' }: { label?: string }) {
   );
 }
 
+const CLOUD_SIGNUP_URL =
+  process.env.NEXT_PUBLIC_CLOUD_SIGNUP_URL ?? 'https://cloud.vectorflow.sh/signup';
+
 export function Nav() {
   return (
     <nav className="nav">
@@ -25,9 +28,11 @@ export function Nav() {
         </div>
         <div className="nav-cta">
           <ThemeToggle />
-          <Link href="/docs" className="btn ghost">Docs</Link>
-          <a href="https://demo.vectorflow.sh/login?prefill=demo" className="btn primary">
-            Try the demo <span className="arrow">→</span>
+          <a href="https://demo.vectorflow.sh/login?prefill=demo" className="btn ghost">
+            Live demo
+          </a>
+          <a href={CLOUD_SIGNUP_URL} className="btn primary">
+            Start free <span className="arrow">→</span>
           </a>
         </div>
       </div>

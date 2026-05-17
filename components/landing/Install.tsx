@@ -1,5 +1,8 @@
 import Link from 'next/link';
 
+const CLOUD_SIGNUP_URL =
+  process.env.NEXT_PUBLIC_CLOUD_SIGNUP_URL ?? 'https://cloud.vectorflow.sh/signup';
+
 const TERMINAL_LINES = [
   { prompt: '$', text: 'mkdir vectorflow && cd vectorflow', kind: 'cmd' },
   { prompt: '$', text: 'curl -sSfL -o docker-compose.yml \\', kind: 'cmd' },
@@ -41,6 +44,12 @@ export function Install() {
                 Production deploy
               </Link>
             </div>
+            <p className="install-alt">
+              Don&rsquo;t want to host it?{' '}
+              <a href={CLOUD_SIGNUP_URL} className="install-alt-link">
+                Start free on VectorFlow Cloud <span className="arrow">→</span>
+              </a>
+            </p>
           </div>
 
           <div className="term">

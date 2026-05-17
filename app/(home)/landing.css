@@ -149,6 +149,9 @@ html.dark .btn.primary:hover { background: #5fb83a; border-color: #5fb83a; }
 html.dark .hero h1 .accent-line { background: linear-gradient(transparent 65%, rgba(125, 217, 87, 0.18) 65%); }
 .hero .sub { max-width: 56ch; font-size: 18px; line-height: 1.55; color: var(--fg-1); margin: 0 0 32px; }
 .hero-cta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.hero-cta-note { margin: 16px 0 0; font-size: 13px; color: var(--fg-2); }
+.hero-cta-note a { color: var(--fg-1); text-decoration: underline; text-decoration-color: var(--line); }
+.hero-cta-note a:hover { text-decoration-color: var(--accent); }
 .hero-meta { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; gap: 32px; flex-wrap: wrap; }
 .hero-meta .item .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-2); margin-bottom: 6px; }
 .hero-meta .item .v { font-family: var(--font-mono); font-size: 14px; color: var(--fg); font-weight: 500; }
@@ -259,6 +262,9 @@ section.block { padding: 96px 0; }
 .install-note { font-family: var(--font-mono); font-size: 13px; color: var(--fg-2); }
 .install-note .mark { color: var(--accent); }
 .install-actions { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+.install-alt { margin: 18px 0 0; font-size: 14px; color: var(--fg-2); }
+.install-alt-link { color: var(--fg); font-weight: 500; text-decoration: underline; text-decoration-color: var(--line); }
+.install-alt-link:hover { color: var(--accent); text-decoration-color: var(--accent); }
 .term { background: var(--c-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--line-2); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.02); }
 .term-bar { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: #0e1013; border-bottom: 1px solid var(--c-line); }
 .term-bar .lights { display: flex; gap: 6px; }
