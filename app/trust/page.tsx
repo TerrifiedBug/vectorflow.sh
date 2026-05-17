@@ -26,16 +26,87 @@ export default function TrustPage() {
             VectorFlow operators cannot read.
           </p>
           <p className="trust-meta">
-            Threat model (source of truth):{' '}
-            <a
-              href="https://github.com/TerrifiedBug/vectorflow/blob/main/docs/cloud/threat-model.md"
-              className="link"
-            >
-              docs/cloud/threat-model.md
+            The diagrams + bullets on this page are the customer-facing
+            summary of the full Cloud threat model. The detailed
+            architecture documentation (adversary model, KMS grant
+            lifecycle, operator runbooks) is internal — see your DPA
+            Schedule 2 if you need to review it under NDA. Contact{' '}
+            <a href="mailto:trust@vectorflow.sh" className="link">
+              trust@vectorflow.sh
             </a>{' '}
-            on GitHub.
+            for the request flow.
           </p>
         </header>
+
+        <section className="wrap trust-section">
+          <h2>Data flow</h2>
+          <p>
+            How customer data moves through VectorFlow Cloud. Read top to
+            bottom — each block names a trust boundary; arrows are the
+            data crossings between them.
+          </p>
+          <figure className="trust-flow" aria-label="VectorFlow Cloud data flow diagram">
+            <pre>
+{`
+┌──────────────────────────────────────────────────────────────────┐
+│  Customer infrastructure (customer trust boundary)                │
+│                                                                   │
+│  ┌──────────────┐    ┌─────────────────┐    ┌──────────────────┐ │
+│  │  Log sources │ ─► │  Vector agent   │ ─► │ Customer log     │ │
+│  │  (apps,      │    │  (runs on       │    │ destinations     │ │
+│  │  services)   │    │  customer infra)│    │ (S3, Splunk, ES) │ │
+│  └──────────────┘    └────────┬────────┘    └──────────────────┘ │
+│                               │ heartbeat + bounded metric        │
+│                               │ samples (no raw payloads)         │
+└───────────────────────────────┼───────────────────────────────────┘
+                                │ HTTPS, mTLS-pinned
+                                │ vf_node_<orgSlug>_*  token
+                                ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  VectorFlow Cloud control plane (vectorflow trust boundary)       │
+│                                                                   │
+│  ┌──────────────────────────────┐   ┌────────────────────────┐   │
+│  │  <orgSlug>.agents.vectorflow │ ─►│  Per-org row store     │   │
+│  │  Postgres + RLS              │   │  (pipeline configs,    │   │
+│  │  (one DEK per organization)  │   │  audit log, fleet      │   │
+│  └──────────────┬───────────────┘   │  metadata)             │   │
+│                 │                   └────────────────────────┘   │
+│                 │ generateDataKey / decryptDataKey                │
+│                 ▼                                                 │
+│  ┌──────────────────────────────┐                                 │
+│  │  AWS KMS  (per-region CMK)   │                                 │
+│  │  EncryptionContext = orgId   │                                 │
+│  └──────────────────────────────┘                                 │
+│                                                                   │
+│  ─────────────────────────────────────  no-decrypt boundary  ──── │
+│                                                                   │
+│  ┌──────────────────────────────┐   ┌────────────────────────┐   │
+│  │  ops.vectorflow.sh (operator │ ─►│  Operator views        │   │
+│  │  console; WebAuthn + VPN)    │   │  (PII-masked; no       │   │
+│  │  reads non-decrypted columns │   │  decrypt without grant)│   │
+│  └──────────────────────────────┘   └────────────────────────┘   │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐    │
+│  │  Break-glass: OrgAccessGrant + KMS GrantToken            │    │
+│  │   ─ requested by operator (Incident role)                │    │
+│  │   ─ approved by customer admin (or auto-approved if      │    │
+│  │     customer opts into P0-first-hour fast path)          │    │
+│  │   ─ ≤60-minute window, single org, audited both sides    │    │
+│  └──────────────────────────────────────────────────────────┘    │
+└──────────────────────────────────────────────────────────────────┘
+`}
+            </pre>
+            <figcaption>
+              <strong>Key invariants:</strong> raw customer log payloads
+              never cross the agent → control-plane boundary;
+              VectorFlow operators cannot decrypt control-plane data
+              without a per-org KMS grant approved by the customer
+              admin; every operator action is mirrored to the
+              customer&rsquo;s own audit log with{' '}
+              <code>userName=&quot;VectorFlow Support&quot;</code>.
+            </figcaption>
+          </figure>
+        </section>
 
         <section className="wrap trust-section">
           <h2>Data we hold</h2>
