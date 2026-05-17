@@ -170,3 +170,33 @@
   background: var(--c-bg2);
   color: var(--c-fg);
 }
+
+/* Data-flow diagram (sh-2). Monospace pre with horizontal scroll for
+   narrow viewports; the ASCII boxes only render correctly on a
+   monospace font, so we anchor `pre` to a monospace family that's
+   stable across iOS Safari / Chrome / Firefox. */
+.trust-flow {
+  margin: 1.5rem 0;
+}
+.trust-flow pre {
+  font-family: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  background: var(--trust-code-bg, #0e1219);
+  color: var(--trust-code-fg, #c5d1de);
+  border: 1px solid var(--trust-line, #2a2f3a);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  white-space: pre;
+}
+.trust-flow figcaption {
+  font-size: 0.85rem;
+  color: var(--trust-fg-muted, #9aa3b1);
+  margin-top: 0.75rem;
+}
+@media (max-width: 768px) {
+  .trust-flow pre {
+    font-size: 0.6rem;
+  }
+}
