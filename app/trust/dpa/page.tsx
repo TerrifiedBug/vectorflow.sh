@@ -29,7 +29,7 @@ export default function DpaPage() {
             PDF within two business days.
           </p>
           <p className="trust-meta">
-            Template version: 1.0 (2026-05-16).
+            Template version: 1.1 (2026-05-17 — §15a R5 stale-link fix; security-measures section now references the internal threat model via the NDA path).
           </p>
         </header>
 
@@ -91,15 +91,17 @@ export default function DpaPage() {
         <section className="wrap trust-section">
           <h2>4. Security measures</h2>
           <p>
-            VectorFlow implements the technical and organizational measures set
-            out in the{' '}
-            <a
-              href="https://github.com/TerrifiedBug/vectorflow/blob/main/docs/cloud/threat-model.md"
-              className="link"
-            >
-              public threat model
+            VectorFlow implements the technical and organizational measures
+            summarised on the{' '}
+            <Link href="/trust" className="link">
+              Trust &amp; Security overview
+            </Link>
+            . The full Cloud threat model is internal; customers under NDA
+            can request a redacted review copy from{' '}
+            <a href="mailto:trust@vectorflow.sh" className="link">
+              trust@vectorflow.sh
             </a>
-            , including:
+            . Measures include:
           </p>
           <ul className="trust-list">
             <li>
